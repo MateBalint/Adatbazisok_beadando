@@ -1,0 +1,7 @@
+﻿C_ID    = ["Adagszám","ADAGSZÁM","ADAGSZAM","ADAGSZµM","ADAGSZ\u00C1M"]
+C_SD    = ["Kezdet_DÁTUM","Kezdet_DATUM","Kezdet_D\u00C1TUM","Kezdet_DµTUM"]
+C_ST    = ["Kezdet_IDŐ","Kezdet_IDO","Kezdet_ID\u0150","Kezdet_IDŠ"]
+C_ED    = ["Vége_DÁTUM","Vege_DATUM","V\u00E9ge_D\u00C1TUM","V‚ge_DµTUM"]
+C_ET    = ["Vége_IDŐ","Vege_IDO","V\u00E9ge_ID\u0150","V‚ge_IDŠ"]
+C_INTRA = ["ADAGKÖZI IDŐ","ADAGKOZI IDO","ADAGK\u00D6ZI ID\u0150","ADAGK\u2122ZI ID\u0160"]
+C_DUR   = ["ADAGIDŐ","ADAGIDO","ADAGID\u0150","ADAGIDŠ"]

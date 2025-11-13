@@ -22,7 +22,7 @@ class DatabaseUtils:
     def seed_data(self, chunks, table_name):
         """
         Seeds the given data to the given table.
-        :param chunks: Data to seed.
+        :param chunks: data to seed.
         :param table_name: Name of the table to seed that data to.
         """
         connection = sqlite3.connect(self.file_path)
@@ -43,7 +43,7 @@ class DatabaseUtils:
     
     def execute_query(self, query: str):
         """
-        This method runs the given SQL query.
+        This method runs the given sql query.
         :param query: Query to run.
         :return: The data if the query ran successfully, None otherwise.
         """
