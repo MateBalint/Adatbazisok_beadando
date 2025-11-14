@@ -10,7 +10,6 @@ from constants.plots import PANEL_NAME, PANEL_ID
 
 class PlotBuilder:
     def build_all_daily_average_panel(self):
-        os.makedirs("out", exist_ok=True)
         df = pd.read_csv(DAILY_AVERAGE_CSV)
         
         plt.figure(figsize=(10,5))
@@ -28,11 +27,9 @@ class PlotBuilder:
         print(f"[DONE] {DAILY_AVERAGE_OUTPUT}")
         
     def build_heatmap_daily_average_panel(self):
-        os.makedirs("out", exist_ok=True)
         df = pd.read_csv(DAILY_AVERAGE_CSV)
         
         pivot = df.pivot(index="name", columns="day", values="avg")
-        # rendezés: panel név szerinti
         pivot = pivot.sort_index()
         
         plt.figure(figsize=(12,4.5))
@@ -49,23 +46,19 @@ class PlotBuilder:
         print(f"[DONE] {HEATMAP_DAILY_AVERAGE}")
         
     def build_panel_1(self):
-        # --- Ellenőrzés ---
         if not os.path.exists(DAILY_AVERAGE_CSV):
             print(f"[HIBA] A fájl nem található: {DAILY_AVERAGE_CSV}")
             print("Futtasd előbb a report.py-t!")
             exit(1)
         
-        # --- Adatok beolvasása ---
         df = pd.read_csv(DAILY_AVERAGE_CSV)
         
-        # Csak a 'Panel hőfok 1' adatait tartjuk meg
         df_panel = df[df["name"] == "Panel hőfok 1"]
         
         if df_panel.empty:
             print("[HIBA] Nincs adat a 'Panel hőfok 1'-hez!")
             exit(1)
         
-        # --- Grafikon létrehozása ---
         plt.figure(figsize=(8,4))
         plt.plot(df_panel["day"], df_panel["avg"], marker='o', linestyle='-', linewidth=1.5)
         plt.title("Panel 1 napi átlaghőmérséklet")
@@ -75,15 +68,12 @@ class PlotBuilder:
         plt.xticks(rotation=45)
         plt.tight_layout()
         
-        # --- Mentés ---
         plt.savefig(PANEL_1_DAILY_AVERAGE, dpi=200)
         plt.close()
         
         print(f"[DONE] Grafikon mentve ide: {PANEL_1_DAILY_AVERAGE}")
 
     def build_panel_1_minmax_band(self):
-        os.makedirs("out", exist_ok=True)
-        
         df_minmax = pd.read_csv(DAILY_MINMAX_CSV)
         df_avg    = pd.read_csv(DAILY_AVERAGE_CSV)
         
@@ -104,11 +94,8 @@ class PlotBuilder:
         print(f"[DONE] {PANEL_1_MINMAX_BAND}")
         
     def build_panel1_outliers(self):
-        os.makedirs("out", exist_ok=True)
-        
         conn = sqlite3.connect(DB_PATH)
         
-        # kis minta-idősor az adott panelhez (OK minőség)
         rows = conn.execute("""
                             SELECT ts_utc, value
                             FROM measurement
@@ -125,17 +112,16 @@ class PlotBuilder:
         ts = [r[0] for r in rows]
         val = [float(r[1]) for r in rows]
         
-        # alapsor
         plt.figure(figsize=(10,4))
         plt.plot(ts, val, linewidth=1.0, label="Értékek")
         
-        # outlierek (első 100 a reportból) – piros pont
         try:
             out = pd.read_csv("out/outliers.csv")
             out_p = out[out["panel_id"] == PANEL_ID].head(100)
             if not out_p.empty:
                 plt.scatter(out_p["ts_utc"], out_p["value"], s=18, marker="o", label="Outlier (TOP100)", zorder=5)
         except Exception as e:
+            print(f"Error happened. Cause: {e}")
             pass
         
         plt.title(f"Panel {PANEL_ID} – mintavétel + outlierek (TOP100)")
