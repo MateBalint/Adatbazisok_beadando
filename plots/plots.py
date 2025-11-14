@@ -3,13 +3,8 @@ import matplotlib.pyplot as plt
 import os
 import sqlite3
 
-
 class PlotBuilder:
-    
     def build_all_daily_average_panel(self):
-        CSV = "out/daily_avg.csv"
-        OUT = "out/all_panels_daily_avg.png"
-        
         os.makedirs("out", exist_ok=True)
         df = pd.read_csv(CSV)
         
@@ -23,14 +18,11 @@ class PlotBuilder:
         plt.xticks(rotation=45)
         plt.legend(ncol=3, fontsize=8)
         plt.tight_layout()
-        plt.savefig(OUT, dpi=200)
+        plt.savefig(self.OUT, dpi=200)
         plt.close()
-        print(f"[DONE] {OUT}")
+        print(f"[DONE] {self.OUT}")
         
     def build_heatmap_daily_average_panel(self):
-        CSV = "out/daily_avg.csv"
-        OUT = "out/heatmap_daily_avg.png"
-        
         os.makedirs("out", exist_ok=True)
         df = pd.read_csv(CSV)
         
@@ -52,9 +44,6 @@ class PlotBuilder:
         print(f"[DONE] {OUT}")
         
     def build_panel_1(self):
-        CSV_PATH = "out/daily_avg.csv"
-        OUT_IMG = "out/panel1_daily_avg.png"
-        
         # --- Ellenőrzés ---
         if not os.path.exists(CSV_PATH):
             print(f"[HIBA] A fájl nem található: {CSV_PATH}")
@@ -88,11 +77,6 @@ class PlotBuilder:
         print(f"[DONE] Grafikon mentve ide: {OUT_IMG}")
 
     def build_panel_1_minmax_band(self):
-        CSV_MINMAX = "out/daily_minmax.csv"
-        CSV_AVG    = "out/daily_avg.csv"
-        OUT        = "out/panel1_minmax_band.png"
-        PANEL_NAME = "Panel hőfok 1"
-        
         os.makedirs("out", exist_ok=True)
         
         df_minmax = pd.read_csv(CSV_MINMAX)
@@ -115,10 +99,6 @@ class PlotBuilder:
         print(f"[DONE] {OUT}")
         
         def build_panel1_outliers():
-            DB = "project.db"
-            OUT = "out/panel1_outliers.png"
-            PANEL_ID = 1  # változtatható
-            
             os.makedirs("out", exist_ok=True)
             
             conn = sqlite3.connect(DB)

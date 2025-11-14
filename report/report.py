@@ -2,9 +2,6 @@ import os
 import sqlite3
 
 class ReportGenerator:
-    DB_PATH = "project.db"
-    OUT_DIR = "../output"
-
     REPORTS = {
         "last_values.csv": """
                            SELECT p.id, p.name, m.ts_utc, m.value
