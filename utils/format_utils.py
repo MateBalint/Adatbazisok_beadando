@@ -1,5 +1,4 @@
-﻿import os
-import shutil
+﻿import shutil
 import sqlite3
 import pandas as pd
 from datetime import datetime
@@ -9,14 +8,14 @@ from constants.adagok import C_ID, C_SD, C_ST, C_ED, C_ET, C_INTRA, C_DUR
 from constants.file_paths import DB_PATH, PANELEK_PATH, ADAGOK_PATH
 from constants.hutopanelek import TIME_KEYS, VALUE_KEYS
 
-
 class FormatUtils:
     def to_iso(self, date_str, time_str):
         """Dátum + idő -> ISO (YYYY-MM-DDTHH:MM:SS)"""
         try:
             dt = datetime.strptime(f"{date_str} {time_str}", "%Y.%m.%d %H:%M:%S")
             return dt.strftime("%Y-%m-%dT%H:%M:%S")
-        except Exception:
+        except Exception as e:
+            print(f"Error happened. Cause: {e}")
             return None
     
     def parse_ts_any(self, s: str):
@@ -31,15 +30,18 @@ class FormatUtils:
         for f in fmts:
             try:
                 return datetime.strptime(s, f).strftime("%Y-%m-%dT%H:%M:%S")
-            except Exception:
+            except Exception as e:
+                print(f"Error happened. Cause: {e}")
                 pass
         return None
     
     def to_int_or_none(x):
-        if pd.isna(x): return None
+        if pd.isna(x): 
+            return None
         try:
             return int(x)
-        except Exception:
+        except Exception as e:
+            print(f"Error happened. Cause: {e}")
             s = str(x).replace(",", ".")
             try:
                 return int(float(s))
@@ -180,8 +182,6 @@ class FormatUtils:
         c2 = conn.execute("SELECT COUNT(*) FROM measurement;").fetchone()[0]
         print(f"[INFO] Összes adag: {c1}, összes mérés: {c2}")
     
-        # --- Biztonsági mentés a betöltés után ---
-        os.makedirs("backup", exist_ok=True)
         backup_path = f"backup/project_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
         shutil.copy(DB_PATH, backup_path)
         print(f"[INFO] Biztonsági mentés készült: {backup_path}")
@@ -189,7 +189,6 @@ class FormatUtils:
         conn.close()
         print("[DONE] Betöltés befejezve.")
 
-    # Gyűjtsük a (panel_id, time_col, value_col) párokat
     def is_time_col(self, colname: str) -> bool:
         low = str(colname).lower()
         return any(k in low for k in TIME_KEYS)

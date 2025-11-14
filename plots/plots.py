@@ -9,7 +9,17 @@ from constants.plots import PANEL_NAME, PANEL_ID
 
 
 class PlotBuilder:
+    def does_file_exist(self, path: str):
+        if not os.path.exists(path):
+            print(f"[HIBA] A fájl nem található: {path}")
+            print("Futtasd előbb a report.py-t!")
+            return False
+        return True
+    
     def build_all_daily_average_panel(self):
+        if not self.does_file_exist(DAILY_AVERAGE_CSV):
+            return
+        
         df = pd.read_csv(DAILY_AVERAGE_CSV)
         
         plt.figure(figsize=(10,5))
@@ -27,8 +37,10 @@ class PlotBuilder:
         print(f"[DONE] {DAILY_AVERAGE_OUTPUT}")
         
     def build_heatmap_daily_average_panel(self):
-        df = pd.read_csv(DAILY_AVERAGE_CSV)
+        if not self.does_file_exist(DAILY_AVERAGE_CSV):
+            return
         
+        df = pd.read_csv(DAILY_AVERAGE_CSV)
         pivot = df.pivot(index="name", columns="day", values="avg")
         pivot = pivot.sort_index()
         
@@ -46,13 +58,10 @@ class PlotBuilder:
         print(f"[DONE] {HEATMAP_DAILY_AVERAGE}")
         
     def build_panel_1(self):
-        if not os.path.exists(DAILY_AVERAGE_CSV):
-            print(f"[HIBA] A fájl nem található: {DAILY_AVERAGE_CSV}")
-            print("Futtasd előbb a report.py-t!")
-            exit(1)
+        if not self.does_file_exist(DAILY_AVERAGE_CSV):
+            return
         
         df = pd.read_csv(DAILY_AVERAGE_CSV)
-        
         df_panel = df[df["name"] == "Panel hőfok 1"]
         
         if df_panel.empty:
@@ -67,13 +76,18 @@ class PlotBuilder:
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.xticks(rotation=45)
         plt.tight_layout()
-        
         plt.savefig(PANEL_1_DAILY_AVERAGE, dpi=200)
         plt.close()
         
         print(f"[DONE] Grafikon mentve ide: {PANEL_1_DAILY_AVERAGE}")
 
     def build_panel_1_minmax_band(self):
+        if not self.does_file_exist(DAILY_MINMAX_CSV):
+            return
+
+        if not self.does_file_exist(DAILY_AVERAGE_CSV):
+            return
+        
         df_minmax = pd.read_csv(DAILY_MINMAX_CSV)
         df_avg    = pd.read_csv(DAILY_AVERAGE_CSV)
         
@@ -94,42 +108,40 @@ class PlotBuilder:
         print(f"[DONE] {PANEL_1_MINMAX_BAND}")
         
     def build_panel1_outliers(self):
-        conn = sqlite3.connect(DB_PATH)
-        
-        rows = conn.execute("""
-                            SELECT ts_utc, value
-                            FROM measurement
-                            WHERE panel_id=? AND quality_code='OK'
-                            ORDER BY ts_utc
-                                LIMIT 2000;
-                            """, (PANEL_ID,)).fetchall()
-        conn.close()
-        
-        if not rows:
-            print("[INFO] Nincs adat a kiválasztott panelhez.")
-            raise SystemExit
-        
-        ts = [r[0] for r in rows]
-        val = [float(r[1]) for r in rows]
-        
-        plt.figure(figsize=(10,4))
-        plt.plot(ts, val, linewidth=1.0, label="Értékek")
-        
-        try:
-            out = pd.read_csv("out/outliers.csv")
-            out_p = out[out["panel_id"] == PANEL_ID].head(100)
-            if not out_p.empty:
-                plt.scatter(out_p["ts_utc"], out_p["value"], s=18, marker="o", label="Outlier (TOP100)", zorder=5)
-        except Exception as e:
-            print(f"Error happened. Cause: {e}")
-            pass
-        
-        plt.title(f"Panel {PANEL_ID} – mintavétel + outlierek (TOP100)")
-        plt.xlabel("Idő")
-        plt.ylabel("Érték (°C)")
-        plt.xticks(rotation=45)
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(PANEL_1_OUTLIERS, dpi=200)
-        plt.close()
-        print(f"[DONE] {PANEL_1_OUTLIERS}")
+        with sqlite3.connect(DB_PATH) as conn:
+            rows = conn.execute("""
+                                SELECT ts_utc, value
+                                FROM measurement
+                                WHERE panel_id=? AND quality_code='OK'
+                                ORDER BY ts_utc
+                                    LIMIT 2000;
+                                """, (PANEL_ID,)).fetchall()
+            
+            if not rows:
+                print("[INFO] Nincs adat a kiválasztott panelhez.")
+                raise SystemExit
+            
+            ts = [r[0] for r in rows]
+            val = [float(r[1]) for r in rows]
+            
+            plt.figure(figsize=(10,4))
+            plt.plot(ts, val, linewidth=1.0, label="Értékek")
+            
+            try:
+                out = pd.read_csv("out/outliers.csv")
+                out_p = out[out["panel_id"] == PANEL_ID].head(100)
+                if not out_p.empty:
+                    plt.scatter(out_p["ts_utc"], out_p["value"], s=18, marker="o", label="Outlier (TOP100)", zorder=5)
+            except Exception as e:
+                print(f"Error happened. Cause: {e}")
+                pass
+            
+            plt.title(f"Panel {PANEL_ID} – mintavétel + outlierek (TOP100)")
+            plt.xlabel("Idő")
+            plt.ylabel("Érték (°C)")
+            plt.xticks(rotation=45)
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig(PANEL_1_OUTLIERS, dpi=200)
+            plt.close()
+            print(f"[DONE] {PANEL_1_OUTLIERS}")

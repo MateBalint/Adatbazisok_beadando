@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import datetime
 import re
 import shutil
-import os
 
 from constants.file_paths import DB_PATH, ADAGOK_PATH, PANELEK_PATH
 
@@ -183,7 +182,6 @@ class DataLoader:
         c2 = conn.execute("SELECT COUNT(*) FROM measurement;").fetchone()[0]
         print(f"[INFO] Összes adag: {c1}, összes mérés: {c2}")
 
-        os.makedirs("../backup", exist_ok=True)
         backup_path = f"backup/project_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
         shutil.copy(DB_PATH, backup_path)
         print(f"[INFO] Biztonsági mentés készült: {backup_path}")
