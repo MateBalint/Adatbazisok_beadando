@@ -1,6 +1,8 @@
 import os
 import sqlite3
 
+from constants.file_paths import DB_PATH, OUTPUT_FOLDER_PATH
+
 class ReportGenerator:
     REPORTS = {
         "last_values.csv": """
@@ -60,8 +62,8 @@ class ReportGenerator:
     }
 
     def __init__(self):
-        self.conn = sqlite3.connect(self.DB_PATH)
-        os.makedirs(self.OUT_DIR, exist_ok=True)
+        self.conn = sqlite3.connect(DB_PATH)
+        os.makedirs(OUTPUT_FOLDER_PATH, exist_ok=True)
 
     def save_query(self, out_path: str, sql: str) -> int:
         cur = self.conn.cursor()
@@ -77,7 +79,7 @@ class ReportGenerator:
     def generate_reports(self):
         for filename, sql in self.REPORTS.items():
             print(f"[INFO] Generálás: {filename} ...")
-            out_path = os.path.join(self.OUT_DIR, filename)
+            out_path = os.path.join(OUTPUT_FOLDER_PATH, filename)
             n = self.save_query(out_path, sql)
             print(f"   → {n} sor elmentve: {out_path}")
         self.conn.close()

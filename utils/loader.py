@@ -5,10 +5,9 @@ import re
 import shutil
 import os
 
+from constants.file_paths import DB_PATH, ADAGOK_PATH, PANELEK_PATH
+
 class DataLoader:
-    DB_PATH = "project.db"
-    ADAGOK_PATH = "Adagok.csv"
-    PANELEK_PATH = "Hutopanelek.csv"
     C_ID = ["Adagszám", "AdagSzám", "Adag szám"]
     C_SD = ["Kezdés dátum", "Kezdés Dátum"]
     C_ST = ["Kezdés idő", "Kezdés Idő"]
@@ -76,7 +75,7 @@ class DataLoader:
         return None
 
     def load(self):
-        conn = sqlite3.connect(self.DB_PATH)
+        conn = sqlite3.connect(DB_PATH)
         conn.execute("PRAGMA foreign_keys = ON;")
         print("[OK] Kapcsolódva az adatbázishoz.")
 
@@ -86,7 +85,7 @@ class DataLoader:
         self.run_sql(conn, "UPDATE panel SET max_valid=200 WHERE max_valid IS NULL;")
         print(f"[OK] {len(panels)} panel feltöltve (min/max beállítva, ha hiányzott).")
 
-        df_adag = pd.read_csv(self.ADAGOK_PATH, sep=";", encoding="cp1250")
+        df_adag = pd.read_csv(ADAGOK_PATH, sep=";", encoding="cp1250")
         cols = df_adag.columns
         col_id    = self.pick(cols, self.C_ID)
         col_sd    = self.pick(cols, self.C_SD)
@@ -120,29 +119,20 @@ class DataLoader:
                      )
         print(f"[OK] {len(batch_rows)} adag feltöltve.")
 
-        df = pd.read_csv(self.PANELEK_PATH, sep=";", encoding="utf-8-sig")
+        df = pd.read_csv(PANELEK_PATH, sep=";", encoding="utf-8-sig")
 
-        def is_time_col(colname: str) -> bool:
-            low = str(colname).lower()
-            return any(k in low for k in self.TIME_KEYS)
+        
 
-        def is_value_col_for_pid(colname: str, pid: int) -> bool:
-            text = str(colname)
-            low  = text.lower()
-            return (str(pid) in text) and any(k in low for k in self.VALUE_KEYS) and not is_time_col(text)
-
-        time_cols = [c for c in df.columns if is_time_col(c)]
+        time_cols = [c for c in df.columns if self.is_time_col(c)]
 
         pairs = []
-        def extract_panel_id(text):
-            m = re.search(r'(\d+)', str(text))
-            return int(m.group(1)) if m else None
+       
 
         for tcol in time_cols:
-            pid = extract_panel_id(tcol)
+            pid = self.extract_panel_id(tcol)
             if pid is None:
                 continue
-            candidates = [c for c in df.columns if is_value_col_for_pid(c, pid)]
+            candidates = [c for c in df.columns if self.is_value_col_for_pid(c, pid)]
             if candidates:
                 vcol = candidates[0]
                 pairs.append((pid, tcol, vcol))
@@ -191,8 +181,21 @@ class DataLoader:
 
         os.makedirs("../backup", exist_ok=True)
         backup_path = f"backup/project_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
-        shutil.copy(self.DB_PATH, backup_path)
+        shutil.copy(DB_PATH, backup_path)
         print(f"[INFO] Biztonsági mentés készült: {backup_path}")
 
         conn.close()
         print("[DONE] Betöltés befejezve.")
+
+    def is_time_col(self, colname: str) -> bool:
+        low = str(colname).lower()
+        return any(k in low for k in self.TIME_KEYS)
+
+    def is_value_col_for_pid(self, colname: str, pid: int) -> bool:
+        text = str(colname)
+        low  = text.lower()
+        return (str(pid) in text) and any(k in low for k in self.VALUE_KEYS) and not self.is_time_col(text)
+
+    def extract_panel_id(self, text):
+        m = re.search(r'(\d+)', str(text))
+        return int(m.group(1)) if m else None
