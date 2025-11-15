@@ -1,7 +1,7 @@
 import os
 import sqlite3
 
-from constants.file_paths import DB_PATH, OUTPUT_FOLDER_PATH
+from constants.file_paths import DB_PATH, OUTPUT_DIR_CSV
 from constants.sql_queries import REPORTS
 
 class ReportGenerator:
@@ -19,7 +19,7 @@ class ReportGenerator:
     def generate_reports(self):
         for filename, sql in REPORTS.items():
             print(f"[INFO] Generálás: {filename} ...")
-            out_path = os.path.join(OUTPUT_FOLDER_PATH, filename)
+            out_path = os.path.join(OUTPUT_DIR_CSV, filename)
             n = self.save_query(out_path, sql)
             print(f"   → {n} sor elmentve: {out_path}")
         print("\n[DONE] Minden riport sikeresen elkészült az 'output' mappába.")

@@ -11,7 +11,9 @@ class FileSystem:
         os.makedirs("backup", exist_ok=True)
 
     def remove_existing_documents(self):
-        os.remove(DB_PATH)
+        if os.path.exists(DB_PATH):
+            os.remove(DB_PATH)
+
         self.remove_generated_files_from_folder(OUTPUT_DIR_CSV)
         self.remove_generated_files_from_folder(OUTPUT_DIR_IMAGES)
 

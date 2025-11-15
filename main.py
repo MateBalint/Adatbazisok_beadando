@@ -28,7 +28,6 @@ class Program:
     
     def main(self):
         plot_builder = PlotBuilder()
-        report_generator = ReportGenerator()
         self.file_system.setup_folders()
         
         while True:
@@ -40,24 +39,21 @@ class Program:
                 break
                 
             elif user_input == 1:
-                report_generator.generate_reports()
-                
-            elif user_input == 2:
                 self.clean_install()
             
-            elif user_input == 3:
+            elif user_input == 2:
                 plot_builder.build_all_daily_average_panel()
 
-            elif user_input == 4:
+            elif user_input == 3:
                 plot_builder.build_heatmap_daily_average_panel()
 
-            elif user_input == 5:
+            elif user_input == 4:
                 plot_builder.build_panel_1_minmax_band()
 
-            elif user_input == 6:
+            elif user_input == 5:
                 plot_builder.build_panel1_outliers()
 
-            elif user_input == 7:
+            elif user_input == 6:
                 plot_builder.build_panel_1()
 
         print("\n" * 2)
