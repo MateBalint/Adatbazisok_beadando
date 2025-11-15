@@ -14,8 +14,7 @@ class FormatUtils:
         try:
             dt = datetime.strptime(f"{date_str} {time_str}", "%Y.%m.%d %H:%M:%S")
             return dt.strftime("%Y-%m-%dT%H:%M:%S")
-        except Exception as e:
-            print(f"Error happened. Cause: {e}")
+        except Exception:
             return None
     
     def parse_ts_any(self, s: str):
@@ -30,8 +29,7 @@ class FormatUtils:
         for f in fmts:
             try:
                 return datetime.strptime(s, f).strftime("%Y-%m-%dT%H:%M:%S")
-            except Exception as e:
-                print(f"Error happened. Cause: {e}")
+            except Exception:
                 pass
         return None
     
@@ -40,21 +38,18 @@ class FormatUtils:
             return None
         try:
             return int(x)
-        except Exception as e:
-            print(f"Error happened. Cause: {e}")
+        except Exception:
             s = str(x).replace(",", ".")
             try:
                 return int(float(s))
-            except Exception as e:
-                print(f"Exception happened. Cause: {e}")
+            except Exception:
                 return None
     
     def to_float_or_none(self, x):
         if pd.isna(x): return None
         try:
             return float(str(x).replace(",", ".").strip())
-        except Exception as e:
-            print(f"Exception happened. Cause: {e}")
+        except Exception:
             return None
     
     def run_sql(self, conn, sql, rows=None):

@@ -132,8 +132,7 @@ class PlotBuilder:
                 out_p = out[out["panel_id"] == PANEL_ID].head(100)
                 if not out_p.empty:
                     plt.scatter(out_p["ts_utc"], out_p["value"], s=18, marker="o", label="Outlier (TOP100)", zorder=5)
-            except Exception as e:
-                print(f"Error happened. Cause: {e}")
+            except Exception:
                 pass
             
             plt.title(f"Panel {PANEL_ID} – mintavétel + outlierek (TOP100)")
