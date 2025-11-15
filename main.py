@@ -9,6 +9,7 @@ class Program:
         self.database = database
     
     def print_menu_with_options(self):
+        print("\n")
         print("1 - Clean install")
         print("2 - Osszes panel atlag homersekletehez szukseges plot diagram generalasa.")
         print("3 - Napi atlaghomerseklet - hoterkep plot diagram generalasa")
@@ -16,6 +17,7 @@ class Program:
         print("5 - Panel - mintavetel + outlierek (TOP 100) plot diagram generalasa")
         print("6 = Panel 1 napi atlaghomerseklet")
         print("0 - Kilepes")
+        print("\n")
     
     def clean_install(self):
         self.file_system.remove_existing_documents()
@@ -33,6 +35,7 @@ class Program:
         while True:
             self.print_menu_with_options()
             user_input = int(input("Kerem adja meg szammal a valasztott lehetoseget: "))
+            print("\n")
             
             if user_input == 0:
                 print("A program kilep.")
