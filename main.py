@@ -11,12 +11,12 @@ class Program:
     def print_menu_with_options(self):
         print("\n")
         print("1 - Clean install")
-        print("2 - Osszes panel atlag homersekletehez szukseges plot diagram generalasa.")
-        print("3 - Napi atlaghomerseklet - hoterkep plot diagram generalasa")
-        print("4 - Adott panel napi min-max-atlag plot diagram generalasa")
-        print("5 - Panel - mintavetel + outlierek (TOP 100) plot diagram generalasa")
-        print("6 = Panel 1 napi atlaghomerseklet")
-        print("0 - Kilepes")
+        print("2 - Összes panel átlaghőmérsékletéhez szükséges plot diagram generálása.")
+        print("3 - Napi átlaghőmérséklet - hőtérkép plot diagram generálása")
+        print("4 - Adott panel napi min-max-átlag plot diagram generálása")
+        print("5 - Panel - mintavétel + outlierek (TOP 100) plot diagram generálása")
+        print("6 = Panel 1 napi átlaghőmérséklet")
+        print("0 - Kilépés")
         print("\n")
     
     def clean_install(self):
@@ -34,11 +34,11 @@ class Program:
         
         while True:
             self.print_menu_with_options()
-            user_input = int(input("Kerem adja meg szammal a valasztott lehetoseget: "))
+            user_input = int(input("Kérem adja meg számmal a választott lehetőséget: "))
             print("\n")
             
             if user_input == 0:
-                print("A program kilep.")
+                print("A program kilép.")
                 break
                 
             elif user_input == 1:
